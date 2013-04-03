@@ -1,0 +1,17 @@
+{
+    "name": "urbantheory/justfit",
+    "description": "Just Fit Search Engine",
+    "keywords": ["apparel", "fashion"],
+    "type": "library",
+    "license": "",
+    "authors": [
+        {
+            "name": "tristar",
+            "email": "tristar@urban-theory.net"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "symfony/browser-kit": "v2.2.0"
+    }
+}
