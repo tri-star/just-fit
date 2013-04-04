@@ -12,20 +12,6 @@ class UrlBuilder {
     
     const HOST_SEARCH_URL = 'http://zozo.jp/_search/search_result.html';
     
-    const PRINT_STYLE_PLAIN     = '5497_21172';
-    const PRINT_STYLE_BORDER    = '5497_21173';
-    const PRINT_STYLE_STRIPE    = '5497_21175';
-    const PRINT_STYLE_CHECK     = '5497_21176';
-    const PRINT_STYLE_PRINT     = '5497_21182';
-    const PRINT_STYLE_ONE_POINT = '5497_21181';
-    const PRINT_STYLE_MISC      = '5497_21183';
-    
-    const NECK_STYLE_U     = '5498_21184';
-    const NECK_STYLE_V     = '5498_21185';
-    const NECK_STYLE_HENRY = '5498_21186';
-    const NECK_STYLE_MISC  = '5498_21189';
-    
-    
     public function __construct() {
     }
     
@@ -56,13 +42,13 @@ class UrlBuilder {
         $descConditions = array();
         
         if($condition->hasValue('sleeve_styles')) {
-            $descConditions = array_merge($descConditions, $condition->get('sleeve_styles'));
+            $descConditions = array_merge($descConditions, $this->getSleeveStyleValues($condition->get('sleeve_styles')));
         }
         if($condition->hasValue('print_styles')) {
-            $descConditions = array_merge($descConditions, $condition->get('print_styles'));
+            $descConditions = array_merge($descConditions, $this->getPrintStyleValues($condition->get('print_styles')));
         }
         if($condition->hasValue('neck_styles')) {
-            $descConditions = array_merge($descConditions, $condition->get('neck_styles'));
+            $descConditions = array_merge($descConditions, $this->getNeckStyleValues($condition->get('neck_styles')));
         }
         
         if(count($descConditions) > 0) {
@@ -92,4 +78,53 @@ class UrlBuilder {
         }
         return $result;
     }
+    
+    /**
+     * Conditionオブジェクが持つprint_stylesの値をZOZOTOWN検索用の値に変換して返す。
+     * @param array $input Conditionオブジェクトのsleeve_stylesに含まれるデータ(Condition::PRINT_STYLE_XXX)
+     */
+    protected function getPrintStyleValues($input) {
+        if(!is_array($input)) {
+            return array();
+        }
+        
+        $result = array();
+        foreach($input as $style) {
+            switch($style) {
+                case Condition::PRINT_STYLE_PLAIN:     $result[] = '5497_21172'; break;
+                case Condition::PRINT_STYLE_BORDER:    $result[] = '5497_21173'; break;
+                case Condition::PRINT_STYLE_STRIPE:    $result[] = '5497_21175'; break;
+                case Condition::PRINT_STYLE_CHECK:     $result[] = '5497_21176'; break;
+                case Condition::PRINT_STYLE_ONE_POINT: $result[] = '5497_21181'; break;
+                case Condition::PRINT_STYLE_PRINT:     $result[] = '5497_21182'; break;
+                case Condition::PRINT_STYLE_MISC:      $result[] = '5497_21183'; break;
+            }
+            continue;
+        }
+        return $result;
+    }
+    
+    
+    /**
+     * Conditionオブジェクが持つneck_stylesの値をZOZOTOWN検索用の値に変換して返す。
+     * @param array $input Conditionオブジェクトのneck_stylesに含まれるデータ(Condition::NECK_STYLE_XXX)
+     */
+    protected function getNeckStyleValues($input) {
+        if(!is_array($input)) {
+            return array();
+        }
+        
+        $result = array();
+        foreach($input as $style) {
+            switch($style) {
+                case Condition::NECK_STYLE_U:     $result[] = '5498_21184'; break;
+                case Condition::NECK_STYLE_V:     $result[] = '5498_21185'; break;
+                case Condition::NECK_STYLE_HENRY: $result[] = '5498_21186'; break;
+                case Condition::NECK_STYLE_MISC:  $result[] = '5498_21189'; break;
+            }
+            continue;
+        }
+        return $result;
+    }
+    
 }

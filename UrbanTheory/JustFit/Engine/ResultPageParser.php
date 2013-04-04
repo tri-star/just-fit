@@ -11,6 +11,8 @@ use Symfony\Component\DomCrawler\Crawler;
  */
 class ResultPageParser {
     
+    const PRODUCT_URL_PREFIX = 'http://zozo.jp';
+    
     public function __construct() {
     }
     
@@ -50,7 +52,7 @@ class ResultPageParser {
         $productUrls = array();
         
         foreach($crawler as $idx=>$node) {
-            $productUrls[] = $node->nodeValue;
+            $productUrls[] = self::PRODUCT_URL_PREFIX . $node->nodeValue;
         }
         
         return $productUrls;
