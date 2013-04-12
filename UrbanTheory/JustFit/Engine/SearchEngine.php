@@ -6,6 +6,7 @@ namespace UrbanTheory\JustFit\Engine;
 use Goutte\Client;
 use UrbanTheory\JustFit\Model\Condition;
 use UrbanTheory\JustFit\Model\Product;
+use Guzzle\Http\Message\Response;
 
 
 /**
@@ -84,10 +85,11 @@ class SearchEngine {
         $this->client->restart();
         
         //件数を取得
-        $numProducts = $this->getNumPages($condition);
+        $resultPageResponse = $this->getResponseWithCondition($condition);
+        $numProducts = $this->resultPageParser->extractProductCount($resultPageResponse->getContent());
         
         //ページ数の特定(今は30件だと仮定している)
-        $numPages = (int)($numProducts / 30);
+        $numPages = (int)($numProducts / 30) + (($numProducts % 30) ? 1 : 0);
         if(isset($this->options[self::OPTION_MAX_PAGES]) && $this->options[self::OPTION_MAX_PAGES] > 0) {
             $numPages = min($numPages, $this->options[self::OPTION_MAX_PAGES]);
         }
@@ -102,21 +104,15 @@ class SearchEngine {
             //検索結果ページのHTMLを取得
             //商品URLの一覧を取得
             $condition->set('page', $i);
+            $resultPageResponse = $this->getResponseWithCondition($condition);
             
-            $urlBuilder = new UrlBuilder();
-            $pagedUrl = $urlBuilder->buildHostSearchUrl($condition);
-            $html = $this->getResponseFromUrl($pagedUrl);
-            
-            $productUrls = $this->resultPageParser->extractProductUrls($html);
+            $productUrls = $this->resultPageParser->extractProductUrls($resultPageResponse->getContent());
             //商品URL単位でループ
             foreach($productUrls as $productUrl) {
                 //商品情報を取得
                 $this->onParseProductStart($parseCount);
                 
                 $response = $this->getResponseFromUrl($this->client, $productUrl);
-                if($response->getStatus() != 200) {
-                    throw new NetworkException('Staus code error: ' . $response->getStatus());
-                }
                 $product = $this->productPageParser->extract($response->getContent());
                 
                 $this->onParseProduct($product);
@@ -144,16 +140,17 @@ class SearchEngine {
     }
     
     /**
-     * 検索条件に合致する商品が何件存在するかを返す。
+     * 指定した検索条件で検索を実行した結果のHTTPレスポンスオブジェクトを返す。
      * @param Condition $condition 検索条件
+     * @return Response
      */
-    protected function getNumPages(Condition $condition) {
+    protected function getResponseWithCondition(Condition $condition) {
         $urlBuilder = new UrlBuilder();
         $hostSearchUrl = $urlBuilder->buildHostSearchUrl($condition);
         
         $response = $this->getResponseFromUrl($hostSearchUrl);
         
-        return $this->resultPageParser->extractProductCount($response->getContent());
+        return $response;
     }
     
     
