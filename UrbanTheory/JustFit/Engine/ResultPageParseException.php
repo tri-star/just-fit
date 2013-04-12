@@ -3,5 +3,5 @@
 namespace UrbanTheory\JustFit\Engine;
 
 
-class ResultPageParseException extends Exception {
+class ResultPageParseException extends \Exception {
 }

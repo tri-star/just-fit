@@ -4,6 +4,8 @@
 namespace UrbanTheory\JustFit\Engine;
 
 
+use UrbanTheory\JustFit\Model\Product;
+
 /**
  * 検索エンジンの検索処理過程で呼び出されるオブジェクト
  */
@@ -38,6 +40,6 @@ class SearchEventHandler {
     /**
      * 商品の解析が完了した時に呼び出される処理
      */
-    public function onParseProduct() {
+    public function onParseProduct(Product $product) {
     }
 }

@@ -2,7 +2,6 @@
 
 namespace UrbanTheory\JustFit\Engine;
 
-use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
@@ -22,6 +21,9 @@ class ResultPageParser {
      * @return int ヒットした商品数
      */
     public function extractProductCount($html) {
+        
+        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'Shift_JIS');
+        
         $crawler = new Crawler($html);
         $crawler = $crawler->filterXPath('//div[@class="sectionHeader clearfix"]/h2');
         
@@ -30,7 +32,7 @@ class ResultPageParser {
         //件数の情報を正規表現で抜き出す
         $matches = array();
         if(!preg_match('/検索結果：([0-9]+)件/', $nodeText, $matches)) {
-            throw new SearchResultException('件数情報を取得出来ませんでした。');
+            throw new ResultPageParseException('件数情報を取得出来ませんでした。');
         }
         
         return $matches[1];
@@ -43,6 +45,9 @@ class ResultPageParser {
      * @return array 検索結果のURLの配列
      */
     public function extractProductUrls($html) {
+        
+        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'Shift_JIS');
+        
         $crawler = new Crawler($html);
         
         //検索結果の総ページ数を取得する
