@@ -40,6 +40,20 @@ class SearchEventHandler {
     /**
      * 商品の解析が完了した時に呼び出される処理
      */
-    public function onParseProduct(Product $product) {
+    public function onparseProduct(Product $product, $matched) {
+    }
+    
+    
+    /**
+     * 
+     * @param \Exception $error
+     */
+    public function onParseProductFail($url, \Exception $error) {
+    }
+    
+    /**
+     * 検索全体が修了した際に呼び出される処理
+     */
+    public function onSearchDone() {
     }
 }

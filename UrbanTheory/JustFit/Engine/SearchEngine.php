@@ -39,6 +39,12 @@ class SearchEngine {
     private $productPageParser;
     
     /**
+     * 商品が検索条件として表示するべきかを判定するオブジェクト
+     * @var FilterChain
+     */
+    private $filterChain;
+    
+    /**
      * HTTPクライアント。ZOZOTOWNを解析する場合、このクライアントは
      * レスポンスに含まれるCookieを適切に扱える必要がある。
      * @var Client
@@ -67,6 +73,9 @@ class SearchEngine {
         if(is_null($this->client)) {
             $this->client = new Client();
         }
+        
+        $this->filterChain = new FilterChain();
+        
         $this->init();
     } 
     
@@ -111,13 +120,14 @@ class SearchEngine {
             foreach($productUrls as $productUrl) {
                 //商品情報を取得
                 $this->onParseProductStart($parseCount);
-                
-                $response = $this->getResponseFromUrl($this->client, $productUrl);
-                $product = $this->productPageParser->extract($response->getContent());
-                
-                $this->onParseProduct($product);
-                //or
-                //on商品解析失敗
+                try {
+                    $response = $this->getResponseFromUrl($this->client, $productUrl);
+                    $product = $this->productPageParser->extract($response->getContent());
+                    $matched = $this->filterChain->isMatch($product);
+                    $this->onParseProduct($product, $matched);
+                } catch(\Exception $e) {
+                    $this->onParseProductFail($productUrl, $e);
+                }
                 $parseCount++;
                 
                 if(isset($this->options[self::OPTION_WEIGHT_PER_PRODUCT]) && $this->options[self::OPTION_WEIGHT_PER_PRODUCT] > 0) {
@@ -125,11 +135,16 @@ class SearchEngine {
                 }
             }
         }
-        //onSearchDone
+        $this->onSearchDone();
     }
     
     public function addEventHandler($handler) {
         $this->eventHandlers[] = $handler;
+    }
+    
+    
+    public function addFilter(FilterInterface $filter) {
+        $this->filterChain->addFilter($filter);
     }
     
     
@@ -190,10 +205,21 @@ class SearchEngine {
         }
     }
     
-    protected function onParseProduct(Product $product) {
+    protected function onParseProduct(Product $product, $matched) {
         foreach($this->eventHandlers as $handler) {
-            $handler->onParseProduct($product);
+            $handler->onParseProduct($product, $matched);
         }
     }
     
+    protected function onParseProductFail($url, \Exception $e) {
+        foreach($this->eventHandlers as $handler) {
+            $handler->onParseProductFail($url, $e);
+        }
+    }
+    
+    protected function onSearchDone() {
+        foreach($this->eventHandlers as $handler) {
+            $handler->onSearchDone();
+        }
+    }
 }
