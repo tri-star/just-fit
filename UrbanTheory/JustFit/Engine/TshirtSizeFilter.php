@@ -10,6 +10,11 @@ class TshirtSizeFilter extends SizeFilterBase {
     
     public function isMatch(Product $product) {
         
+        if(!is_object($this->condition)) {
+            //条件が全く指定されていない場合、現在はtrueを返す。
+            return true;
+        }
+        
         $lengthMin = $this->condition->get('tshirt_length_min', null);
         $lengthMax = $this->condition->get('tshirt_length_max', null);
         $shoulderMin = $this->condition->get('tshirt_shoulder_min', null);

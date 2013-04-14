@@ -34,7 +34,7 @@ class Condition {
         $this->init(array());
     }
     
-    public function init($data) {
+    public function init($data=array()) {
         $this->data = $data;
     }
     
