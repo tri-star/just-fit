@@ -63,6 +63,8 @@ class Condition {
         return true;
     }
     
-    
+    public function getHash() {
+        return md5(serialize($this->data));
+    }
 }
 

@@ -180,7 +180,7 @@ class SearchEngine {
         $this->client->request('GET', $url);
         $response = $this->client->getResponse();
         if($response->getStatus() != 200) {
-            throw new NetworkException('Staus code error: ' . $response->getStatus());
+            throw new NetworkException('Staus code error: ' . $response->getStatus() . "\n" . "URL:" . $url);
         }
         return $response;
     }
