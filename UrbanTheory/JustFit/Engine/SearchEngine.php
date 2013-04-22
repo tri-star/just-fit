@@ -72,6 +72,7 @@ class SearchEngine {
         $this->client = $client;
         if(is_null($this->client)) {
             $this->client = new Client();
+            $this->client->getClient()->setUserAgent(false);
         }
         
         $this->filterChain = new FilterChain();
@@ -121,7 +122,7 @@ class SearchEngine {
                 //商品情報を取得
                 $this->onParseProductStart($parseCount);
                 try {
-                    $response = $this->getResponseFromUrl($this->client, $productUrl);
+                    $response = $this->getResponseFromUrl($productUrl);
                     $product = $this->productPageParser->extract($response->getContent());
                     $matched = $this->filterChain->isMatch($product);
                     $this->onParseProduct($product, $matched);

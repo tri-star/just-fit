@@ -5,6 +5,7 @@ namespace UrbanTheory\JustFit\Engine;
 
 use Symfony\Component\DomCrawler\Crawler;
 use UrbanTheory\JustFit\Model\Product;
+use UrbanTheory\JustFit\Model\Size;
 
 
 /**
