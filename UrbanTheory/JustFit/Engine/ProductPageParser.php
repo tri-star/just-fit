@@ -30,6 +30,8 @@ class ProductPageParser {
         $product->setBasePrice($priceData['base_price']);
         $product->setUrl($this->getProductUrl($crawler));
         $product->setImageUrl($this->getImageUrl($crawler));
+        $product->setProductCode($this->getProductCode( $product->getUrl() ));
+        $product->setContactNo($this->getContactNo( $product->getUrl() ));
         
         $sizes = $this->getSizeInfo($crawler);
         foreach($sizes as $size) {
@@ -38,6 +40,23 @@ class ProductPageParser {
         return $product;
     }
     
+    private function getProductCode($productUrl) {
+        //商品URLから抽出する。
+        $matches = array();
+        if(!preg_match('/gid=([0-9]+)/i', $productUrl, $matches)) {
+            return '';
+        }
+        //URL中のgidで取得できる番号が商品コード。
+        return $matches[1];
+    }
+    
+    private function getContactNo($productUrl) {
+        //商品コードの先頭の番号を+1すると問い合わせ番号になる模様。
+        $productCode = $this->getProductCode($productUrl);
+        $headDigit = (int)substr($productCode, 0, 1);
+        $headDigit++;
+        return $headDigit . substr($productCode, 1);
+    }
     
     private function getBrandName(Crawler $crawler) {
         $crawler = $crawler->filterXPath('//ul[@id="nameList"]/li/a');
@@ -65,19 +84,19 @@ class ProductPageParser {
     }
     
     private function getPrice(Crawler $crawler) {
-        $crawler = $crawler->filterXPath('//p[@class="price priceDown"]/span');
-        if($crawler->count() > 0) {
-            $price = $this->numberize($crawler->text());
+        $c = $crawler->filterXPath('//p[@class="price priceDown"]/span');
+        if($c->count() > 0) {
+            $price = $this->numberize($c->text());
             return array('price' => $price, 'base_price' => $price);
         }
-        $crawler = $crawler->filterXPath('//p[@class="price"]/span');
-        if($crawler->count() > 0) {
-            $price = $this->numberize($crawler->text());
+        $c = $crawler->filterXPath('//p[@class="price"]/span');
+        if($c->count() > 0) {
+            $price = $this->numberize($c->text());
             return array('price' => $price, 'base_price' => $price);
         }
-        $crawler = $crawler->filterXPath('//p[@class="price"]');
-        if($crawler->count() > 0) {
-            $price = $this->numberize($crawler->text());
+        $c = $crawler->filterXPath('//p[@class="price"]');
+        if($c->count() > 0) {
+            $price = $this->numberize($c->text());
             return array('price' => $price, 'base_price' => $price);
         }
         return array('price' => 0, 'base_price' => 0);
@@ -151,7 +170,7 @@ class ProductPageParser {
     }
     
     private function numberize($string) {
-        return str_replace(array('¥', ',','→'), array('', ''), $string);
+        return str_replace(array('\\', '¥', ',','→', '￥'), array('', '', '', ''), $string);
     }
     
 }

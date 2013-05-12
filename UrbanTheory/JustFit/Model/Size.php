@@ -59,5 +59,8 @@ class Size {
         return isset($this->data[$key]);
     }
     
+    public function getAllData() {
+        return $this->data;
+    }
 }
 

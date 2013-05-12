@@ -7,6 +7,8 @@ namespace UrbanTheory\JustFit\Model;
  */
 class Product {
     
+    private $productCode;
+    
     private $name;
     
     private $brandName;
@@ -19,6 +21,8 @@ class Product {
     
     private $imageUrl;
     
+    private $contactNo;
+    
     /**
      * 
      * @var SizeCollection
@@ -30,13 +34,19 @@ class Product {
     }
     
     public function init() {
+        $this->productCode = '';
         $this->name = '';
         $this->brandName = array();
         $this->url = '';
         $this->price = 0;
         $this->basePrice = 0;
         $this->imageUrl = '';
+        $this->contactNo = '';
         $this->sizeCollection = new SizeCollection();
+    }
+    
+    public function getProductCode() {
+        return $this->productCode;
     }
     
     public function getName() {
@@ -62,12 +72,21 @@ class Product {
     public function getBasePrice() {
         return $this->basePrice;
     }
-
+    
     /**
      * @return SizeCollection
      */
     public function getSizeCollection() {
         return $this->sizeCollection;
+    }
+    
+    public function getContactNo() {
+        return $this->contactNo;
+    }
+    
+    
+    public function setProductCode($code) {
+        $this->productCode = $code;
     }
     
     public function setName($name) {
@@ -92,6 +111,10 @@ class Product {
     
     public function setBasePrice($basePrice) {
         $this->basePrice = $basePrice;
+    }
+    
+    public function setContactNo($contactNo) {
+        $this->contactNo = $contactNo;
     }
     
 }
